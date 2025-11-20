@@ -21,7 +21,6 @@ const Sidebar = () => {
               }`}
             >
               <Icon />
-              {/* Small device এ নাম লুকাবে, medium (md) থেকে দেখাবে */}
               <span className="hidden md:inline">{data?.name}</span>
             </Link>
           </div>

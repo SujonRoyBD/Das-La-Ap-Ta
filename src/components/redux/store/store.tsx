@@ -1,6 +1,6 @@
 // components/redux/store/store.ts
 import { configureStore } from '@reduxjs/toolkit'
-import cartReducer from './cartSlice'  // cartSlice ঠিকমতো ইম্পোর্ট করতে হবে
+import cartReducer from './cartSlice'  
 
 export const store = configureStore({
   reducer: {

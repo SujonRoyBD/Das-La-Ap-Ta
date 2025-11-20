@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { DataTable } from "@/components/reusable/data-table";
 import { Input } from "@/components/ui/input";
 import { ColumnDef } from "@tanstack/react-table";
-import { Delete, Edit, FilterIcon } from "lucide-react";
+import { Edit, FilterIcon, ShowerHead } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -22,6 +22,15 @@ export type Category = {
   contentCount: number;
   status: string;
 };
+
+const initialCategories: Category[] = [
+  { id: 1, name: "Action", description: "Movies with a lot of action and stunts", contentCount: 248, status: "Deactive" },
+  { id: 2, name: "Comedy", description: "Funny movies to make you laugh", contentCount: 176, status: "Deactive" },
+  { id: 3, name: "Drama", description: "Emotional and story-driven movies", contentCount: 215, status: "Active" },
+  { id: 4, name: "Horror", description: "Scary movies with suspense", contentCount: 120, status: "Active" },
+  { id: 5, name: "Sci-Fi", description: "Futuristic and science-based movies", contentCount: 189, status: "Deactive" },
+  { id: 6, name: "Romance", description: "Love and relationship based movies", contentCount: 98, status: "Active" },
+];
 
 // কলাম ডিফাইন করার ফাংশন
 const getColumns = (
@@ -67,14 +76,16 @@ const getColumns = (
             setEditModalOpen(true);
           }}
         />
-        <Delete className="cursor-pointer" />
+    
+          <ShowerHead className="cursor-pointer" />
+
       </span>
     ),
   },
 ];
 
-export default function CategoryTable() {
-  const [categories, setCategories] = useState<Category[]>([]);
+export default function OrderTable() {
+  const [categories, setCategories] = useState<Category[]>(initialCategories);
   const [page, setPage] = useState(1);
   const [pageSize] = useState(10);
 
@@ -89,22 +100,6 @@ export default function CategoryTable() {
     []
   );
 
-  // সার্ভার থেকে ডাটা ফেচিং
-  useEffect(() => {
-    async function fetchCategories() {
-      try {
-        const res = await fetch("http://localhost:5000/api/categories");
-        if (!res.ok) throw new Error("Failed to fetch");
-        const data = await res.json();
-        setCategories(data);
-      } catch (error) {
-        console.error(error);
-      }
-    }
-
-    fetchCategories();
-  }, []);
-
   // Filter এবং pagination প্রয়োগ
   const filteredData = useMemo(() => {
     return categories
@@ -116,41 +111,16 @@ export default function CategoryTable() {
       .slice((page - 1) * pageSize, page * pageSize);
   }, [categories, search, filterStatus, page, pageSize]);
 
-  // Save edited category - API PUT কলসহ
- const handleSave = async (updated: Category) => {
-  try {
-    const response = await fetch(`http://localhost:5000/api/categories/${updated.id}`, {
-
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(updated),
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to update category");
-    }
-
-    const updatedCategory = await response.json();
-    console.log("Updated from server:", updatedCategory);
-
+  // Save edited category - লোকাল স্টেটে আপডেট
+  const handleSave = (updated: Category) => {
     setCategories((prev) =>
-      prev.map((item) => (item.id === updatedCategory.id ? updatedCategory : item))
+      prev.map((item) => (item.id === updated.id ? updated : item))
     );
-
-    console.log("Categories after update:", categories); // এখানে স্টেট ইমিডিয়েটলি আপডেট হয় না, তাই useEffect এ লগ করা ভালো
-
     setEditModalOpen(false);
-  } catch (error) {
-    console.error("Update failed:", error);
-  }
-};
-
+  };
 
   return (
     <div className="w-full">
-       
       <EditCategoryModal
         open={editModalOpen}
         onClose={() => setEditModalOpen(false)}
@@ -203,15 +173,16 @@ export default function CategoryTable() {
 }
 
 
-//api integration
+ //api use
+
 
 // "use client";
 
+// import { useState, useMemo, useEffect } from "react";
 // import { DataTable } from "@/components/reusable/data-table";
 // import { Input } from "@/components/ui/input";
 // import { ColumnDef } from "@tanstack/react-table";
 // import { Delete, Edit, FilterIcon } from "lucide-react";
-// import { useEffect, useMemo, useState } from "react";
 // import {
 //   Select,
 //   SelectContent,
@@ -230,7 +201,7 @@ export default function CategoryTable() {
 //   status: string;
 // };
 
-// // columns function
+// // কলাম ডিফাইন করার ফাংশন
 // const getColumns = (
 //   setSelectedCategory: (c: Category) => void,
 //   setEditModalOpen: (b: boolean) => void
@@ -282,8 +253,6 @@ export default function CategoryTable() {
 
 // export default function CategoryTable() {
 //   const [categories, setCategories] = useState<Category[]>([]);
-//   const [isLoading, setIsLoading] = useState(true);
-
 //   const [page, setPage] = useState(1);
 //   const [pageSize] = useState(10);
 
@@ -291,59 +260,75 @@ export default function CategoryTable() {
 //   const [filterStatus, setFilterStatus] = useState("");
 
 //   const [editModalOpen, setEditModalOpen] = useState(false);
-//   const [selectedCategory, setSelectedCategory] = useState<Category | null>(
-//     null
-//   );
-
-//   // fetch data
-//   useEffect(() => {
-//     const loadData = async () => {
-//       try {
-//         const res = await fetch("http://localhost:5000/api/categories");
-//         const data = await res.json();
-//         setCategories(data);
-//       } catch (err) {
-//         console.log("API error:", err);
-//       }
-//       setIsLoading(false);
-//     };
-//     loadData();
-//   }, []);
+//   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
 
 //   const columns = useMemo(
 //     () => getColumns(setSelectedCategory, setEditModalOpen),
 //     []
 //   );
 
-//   // filter + paginate
+//   // সার্ভার থেকে ডাটা ফেচিং
+//   useEffect(() => {
+//     async function fetchCategories() {
+//       try {
+//         const res = await fetch("http://localhost:5000/api/categories");
+//         if (!res.ok) throw new Error("Failed to fetch");
+//         const data = await res.json();
+//         setCategories(data);
+//       } catch (error) {
+//         console.error(error);
+//       }
+//     }
+
+//     fetchCategories();
+//   }, []);
+
+//   // Filter এবং pagination প্রয়োগ
 //   const filteredData = useMemo(() => {
 //     return categories
 //       .filter((item) => {
-//         const matchSearch = item.name
-//           .toLowerCase()
-//           .includes(search.toLowerCase());
-
-//         const matchStatus =
-//           filterStatus === "" ? true : item.status === filterStatus;
-
+//         const matchSearch = item.name.toLowerCase().includes(search.toLowerCase());
+//         const matchStatus = filterStatus === "" ? true : item.status === filterStatus;
 //         return matchSearch && matchStatus;
 //       })
 //       .slice((page - 1) * pageSize, page * pageSize);
 //   }, [categories, search, filterStatus, page, pageSize]);
 
-//   // Save edited category
-//   const handleSave = (updated: Category) => {
-//     setCategories((prev) =>
-//       prev.map((item) => (item.id === updated.id ? updated : item))
-//     );
-//     setEditModalOpen(false);
-//   };
+//   // Save edited category - API PUT কলসহ
+//  const handleSave = async (updated: Category) => {
+//   try {
+//     const response = await fetch(`http://localhost:5000/api/categories/${updated.id}`, {
 
-//   if (isLoading) return <div className="text-white">Loading...</div>;
+//       method: "PUT",
+//       headers: {
+//         "Content-Type": "application/json",
+//       },
+//       body: JSON.stringify(updated),
+//     });
+
+//     if (!response.ok) {
+//       throw new Error("Failed to update category");
+//     }
+
+//     const updatedCategory = await response.json();
+//     console.log("Updated from server:", updatedCategory);
+
+//     setCategories((prev) =>
+//       prev.map((item) => (item.id === updatedCategory.id ? updatedCategory : item))
+//     );
+
+//     console.log("Categories after update:", categories); // এখানে স্টেট ইমিডিয়েটলি আপডেট হয় না, তাই useEffect এ লগ করা ভালো
+
+//     setEditModalOpen(false);
+//   } catch (error) {
+//     console.error("Update failed:", error);
+//   }
+// };
+
 
 //   return (
 //     <div className="w-full">
-//       {/* Modal */}
+       
 //       <EditCategoryModal
 //         open={editModalOpen}
 //         onClose={() => setEditModalOpen(false)}
@@ -362,7 +347,6 @@ export default function CategoryTable() {
 //         <h2 className="text-white text-lg mb-4">All Categories</h2>
 
 //         <div className="flex gap-4 mb-4">
-//           {/* Search */}
 //           <Input
 //             className="h-[45px] flex-1 rounded bg-[#131824] text-white"
 //             placeholder="Search categories..."
@@ -370,12 +354,9 @@ export default function CategoryTable() {
 //             onChange={(e) => setSearch(e.target.value)}
 //           />
 
-//           {/* Filter */}
 //           <Select
 //             value={filterStatus}
-//             onValueChange={(value) =>
-//               setFilterStatus(value === "all" ? "" : value)
-//             }
+//             onValueChange={(value) => setFilterStatus(value === "all" ? "" : value)}
 //           >
 //             <SelectTrigger className="!h-[45px] w-[160px] bg-[#131824] text-white">
 //               <SelectValue placeholder="Filter by Status" />
@@ -383,15 +364,9 @@ export default function CategoryTable() {
 
 //             <SelectContent className="bg-[#131824]">
 //               <SelectGroup>
-//                 <SelectItem value="all" className="text-white">
-//                   All
-//                 </SelectItem>
-//                 <SelectItem value="Active" className="text-white">
-//                   Active
-//                 </SelectItem>
-//                 <SelectItem value="Deactive" className="text-white">
-//                   Deactive
-//                 </SelectItem>
+//                 <SelectItem value="all" className="text-white">All</SelectItem>
+//                 <SelectItem value="Active" className="text-white">Active</SelectItem>
+//                 <SelectItem value="Deactive" className="text-white">Deactive</SelectItem>
 //               </SelectGroup>
 //             </SelectContent>
 //           </Select>
@@ -404,3 +379,5 @@ export default function CategoryTable() {
 //     </div>
 //   );
 // }
+
+
