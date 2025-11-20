@@ -1,7 +1,8 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
+import NewDig from "../newDig/page";
 
 type FormData = {
   name: string;
@@ -11,6 +12,8 @@ type FormData = {
 };
 
 export default function UserForm() {
+  const [showEditPage, setShowEditPage] = useState(false);
+
   const {
     register,
     handleSubmit,
@@ -19,11 +22,29 @@ export default function UserForm() {
 
   const onSubmit = (data: FormData) => {
     console.log("Form Data:", data);
-    // এখানে আপনি API কল করতে পারেন বা অন্য কাজ করতে পারেন
+    // API call or other logic
   };
+
+  if (showEditPage) {
+    return (
+      <div className="max-w">
+      
+        <NewDig/>
+      </div>
+    );
+  }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="max-w-md mx-auto p-4">
+
+        <button
+        type="button"
+        onClick={() => setShowEditPage(true)}
+        className="ml-4 bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700"
+      >
+        Go to Edit Page (No route change)
+      </button>
+
       <div className="mb-4">
         <label className="block mb-1 font-semibold">Name</label>
         <input
@@ -88,6 +109,9 @@ export default function UserForm() {
       >
         Submit
       </button>
+
+    
     </form>
   );
 }
+

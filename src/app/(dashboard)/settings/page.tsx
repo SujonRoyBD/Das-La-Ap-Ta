@@ -1,7 +1,7 @@
 
 import { RenderPortal } from '@/components/reusable/renderPortal'
 import React from 'react'
-import Tab from '../(tabs)/tabs/page'
+import Tab from '../tabs/tabs/page'
 
 export default function Settings() {
   return (

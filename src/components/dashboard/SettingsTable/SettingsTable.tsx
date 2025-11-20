@@ -14,7 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import EditCategoryModal from "../EditMordal/EditMordal";
-import Userfrom from "@/app/(dashboard)/(tabs)/userform/page";
+import Userfrom from "@/app/(dashboard)/tabs/userform/page";
 
 export type Category = {
   id: number;
